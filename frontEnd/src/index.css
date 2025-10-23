@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --md-sys-color-primary: #14B8A6;
+  --md-sys-color-on-primary: #FFFFFF;
+  --md-sys-color-primary-container: #CCFBF1;
+  --md-sys-color-on-primary-container: #134E4A;
+  --md-sys-color-secondary: #06B6D4;
+  --md-sys-color-on-secondary: #FFFFFF;
+  --md-sys-color-secondary-container: #E0F2FE;
+  --md-sys-color-on-secondary-container: #0C4A6E;
+  --md-sys-color-surface: #FFFFFF;
+  --md-sys-color-on-surface: #0F172A;
+  --md-sys-color-surface-variant: #F8FAFC;
+  --md-sys-color-on-surface-variant: #475569;
+  --md-sys-color-error: #F87171;
+  --md-sys-color-on-error: #FFFFFF;
+  --md-sys-color-error-container: #FEE2E2;
+  --md-sys-color-on-error-container: #991B1B;
+  --md-sys-color-success: #10B981;
+  --md-sys-color-on-success: #FFFFFF;
+  --md-sys-color-success-container: #D1FAE5;
+  --md-sys-color-on-success-container: #065F46;
+  --md-sys-color-outline: #CBD5E1;
+  --md-sys-color-shadow: rgba(0, 0, 0, 0.1);
+  --md-sys-color-background: #F8FAFC;
+}
+
+[data-theme="dark"] {
+  --md-sys-color-primary: #22D3EE;
+  --md-sys-color-on-primary: #164E63;
+  --md-sys-color-primary-container: #0E7490;
+  --md-sys-color-on-primary-container: #CFFAFE;
+  --md-sys-color-secondary: #2DD4BF;
+  --md-sys-color-on-secondary: #134E4A;
+  --md-sys-color-secondary-container: #115E59;
+  --md-sys-color-on-secondary-container: #CCFBF1;
+  --md-sys-color-surface: #1E293B;
+  --md-sys-color-on-surface: #F1F5F9;
+  --md-sys-color-surface-variant: #334155;
+  --md-sys-color-on-surface-variant: #CBD5E1;
+  --md-sys-color-error: #FCA5A5;
+  --md-sys-color-on-error: #7F1D1D;
+  --md-sys-color-error-container: #991B1B;
+  --md-sys-color-on-error-container: #FEE2E2;
+  --md-sys-color-success: #34D399;
+  --md-sys-color-on-success: #064E3B;
+  --md-sys-color-success-container: #065F46;
+  --md-sys-color-on-success-container: #D1FAE5;
+  --md-sys-color-outline: #475569;
+  --md-sys-color-shadow: rgba(0, 0, 0, 0.3);
+  --md-sys-color-background: #0F172A;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-surface);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .glass {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.parallax-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .fade-in-up,
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

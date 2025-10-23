@@ -1,0 +1,36 @@
+## OS
+Thumbs.db
+.DS_Store
+
+## Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+env/
+venv/
+ENV/
+.env
+*.sqlite3
+
+## Node
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+## Vite/TypeScript
+*.tsbuildinfo
+
+## IDEs
+.vscode/
+/.idea/
+
+## Misc
+out.csv
+
+# Ignore Python virtualenvs
+\.venv/

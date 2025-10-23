@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Backend Test - Bank Statement Parser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .status-healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #f0f3ff;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+        }
+        
+        .result h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .data-table {
+            width: 100%;
+            margin-top: 15px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .data-table tr {
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-table tr:last-child {
+            border-bottom: none;
+        }
+        
+        .data-table td {
+            padding: 15px;
+        }
+        
+        .data-table td:first-child {
+            font-weight: 600;
+            color: #555;
+            width: 40%;
+        }
+        
+        .data-table td:last-child {
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .file-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .test-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .test-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .test-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏦 Bank Statement Parser</h1>
+        <p class="subtitle">Flask Backend Integration Test</p>
+        
+        <div id="status"></div>
+        
+        <div class="test-buttons">
+            <button class="test-btn" onclick="testHealth()">Test Health</button>
+            <button class="test-btn" onclick="testBanks()">Get Banks</button>
+            <button class="test-btn" onclick="clearResults()">Clear Results</button>
+        </div>
+        
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📄</div>
+            <h3>Drop PDF here or click to browse</h3>
+            <p style="color: #666; margin-top: 10px;">Bank of America statements only</p>
+        </div>
+        
+        <input type="file" id="fileInput" accept=".pdf" onchange="handleFile(this.files[0])">
+        
+        <div id="fileInfo"></div>
+        
+        <button class="btn" id="parseBtn" onclick="parseStatement()" disabled>
+            Parse Statement
+        </button>
+        
+        <div id="result"></div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let selectedFile = null;
+        
+        // Check backend health on load
+        window.addEventListener('load', () => {
+            testHealth();
+        });
+        
+        // Drag and drop handlers
+        const uploadArea = document.getElementById('uploadArea');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.add('dragover');
+            });
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.remove('dragover');
+            });
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        function handleFile(file) {
+            if (!file) return;
+            
+            if (file.type !== 'application/pdf') {
+                alert('Please select a PDF file');
+                return;
+            }
+            
+            selectedFile = file;
+            document.getElementById('fileInfo').innerHTML = `
+                <div class="file-info">
+                    <span>📄 ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                    <button class="test-btn" onclick="clearFile()">✕ Remove</button>
+                </div>
+            `;
+            document.getElementById('parseBtn').disabled = false;
+            document.getElementById('result').innerHTML = '';
+        }
+        
+        function clearFile() {
+            selectedFile = null;
+            document.getElementById('fileInfo').innerHTML = '';
+            document.getElementById('parseBtn').disabled = true;
+            document.getElementById('fileInput').value = '';
+        }
+        
+        function clearResults() {
+            document.getElementById('result').innerHTML = '';
+        }
+        
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                document.getElementById('status').innerHTML = `
+                    <span class="status-badge status-healthy">
+                        ✓ Backend Online - ${data.service} v${data.version}
+                    </span>
+                `;
+            } catch (error) {
+                document.getElementById('status').innerHTML = `
+                    <span class="status-badge status-error">
+                        ✗ Backend Offline - Please start Flask backend
+                    </span>
+                `;
+            }
+        }
+        
+        async function testBanks() {
+            try {
+                const response = await fetch(`${API_URL}/banks`);
+                const data = await response.json();
+                
+                let banksHtml = '<div class="result success"><h3>Supported Banks:</h3><ul>';
+                data.banks.forEach(bank => {
+                    const statusEmoji = bank.status === 'active' ? '✅' : '🚧';
+                    banksHtml += `<li style="padding: 8px;">${statusEmoji} <strong>${bank.name}</strong> (${bank.id}) - ${bank.status}</li>`;
+                });
+                banksHtml += '</ul></div>';
+                
+                document.getElementById('result').innerHTML = banksHtml;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="result error">
+                        <h3>Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function parseStatement() {
+            if (!selectedFile) return;
+            
+            const parseBtn = document.getElementById('parseBtn');
+            parseBtn.disabled = true;
+            parseBtn.innerHTML = '<span class="loading"></span> Parsing...';
+            
+            document.getElementById('result').innerHTML = '';
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                
+                const response = await fetch(`${API_URL}/parse`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    let resultHtml = `
+                        <div class="result success">
+                            <h3>✅ Statement Parsed Successfully!</h3>
+                            <p><strong>Bank:</strong> ${data.bank}</p>
+                            <p><strong>Method:</strong> ${data.method === 'text-based' ? 'Text-based extraction' : 'OCR extraction'}</p>
+                    `;
+                    
+                    if (data.warnings && data.warnings.length > 0) {
+                        resultHtml += '<p><strong>Warnings:</strong></p><ul>';
+                        data.warnings.forEach(w => {
+                            resultHtml += `<li>${w}</li>`;
+                        });
+                        resultHtml += '</ul>';
+                    }
+                    
+                    if (data.data) {
+                        resultHtml += `
+                            <table class="data-table">
+                                <tr>
+                                    <td>Account Number</td>
+                                    <td>${data.data.account_number || 'N/A'}</td>
+                                </tr>
+                                <tr>
+                                    <td>Statement Date</td>
+                                    <td>${formatDate(data.data.statement_date)}</td>
+                                </tr>
+                                <tr>
+                                    <td>Payment Due Date</td>
+                                    <td>${formatDate(data.data.payment_due_date)}</td>
+                                </tr>
+                                <tr>
+                                    <td>Minimum Payment Due</td>
+                                    <td>${formatCurrency(data.data.minimum_payment_due)}</td>
+                                </tr>
+                                <tr>
+                                    <td>New Balance</td>
+                                    <td style="font-weight: bold; font-size: 18px;">${formatCurrency(data.data.new_balance)}</td>
+                                </tr>
+                            </table>
+                        `;
+                    }
+                    
+                    resultHtml += '</div>';
+                    document.getElementById('result').innerHTML = resultHtml;
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <div class="result error">
+                            <h3>❌ Parsing Failed</h3>
+                            <p><strong>Error:</strong> ${data.error || 'Unknown error'}</p>
+                            ${data.message ? `<p>${data.message}</p>` : ''}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Request Failed</h3>
+                        <p>${error.message}</p>
+                        <p>Make sure Flask backend is running on http://localhost:5000</p>
+                    </div>
+                `;
+            } finally {
+                parseBtn.disabled = false;
+                parseBtn.innerHTML = 'Parse Statement';
+            }
+        }
+        
+        function formatCurrency(amount) {
+            if (amount === null || amount === undefined) return 'N/A';
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(amount);
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            try {
+                return new Date(dateString).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } catch {
+                return dateString;
+            }
+        }
+    </script>
+</body>
+</html>

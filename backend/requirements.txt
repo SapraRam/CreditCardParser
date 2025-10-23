@@ -1,0 +1,11 @@
+flask
+flask-cors
+PyPDF2
+pdfplumber
+pytesseract
+Pillow
+python-dateutil
+regex
+opencv-python
+numpy
+PyMuPDF
