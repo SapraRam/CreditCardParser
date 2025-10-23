@@ -47,7 +47,11 @@ def _preprocess_for_ocr(img: Image.Image) -> List[Image.Image]:
     v2 = v2.filter(ImageFilter.UnsharpMask(radius=1, percent=170, threshold=3))
     variants.append(v2)
 
-    v3 = g.point(lambda x: 255 if x > 180 else 0, mode="1").convert("L")
+    # create a thresholded (binary) variant using a lookup table to avoid lambda typing issues
+    lut = [0] * 256
+    for i in range(256):
+        lut[i] = 255 if i > 180 else 0
+    v3 = g.point(lut, mode="1").convert("L")
     variants.append(v3)
 
     v4 = ImageOps.invert(g)
@@ -270,13 +274,16 @@ def _best_amount_for_label(label: str, candidates: List[str], avoid_zero: bool =
         if v < min_value:
             continue
         score = 0.0
-        if "$" in raw: score += 0.5
-        if "," in raw: score += 1.0
+        if "$" in raw:
+            score += 0.5
+        if "," in raw:
+            score += 1.0
         score += min(v / 10000.0, 5.0)  # favor larger, but cap
         # For limits, prefer >= 1000
         if re.search(r"limit|line", label, flags=re.I) and v < 500:
             score -= 3.0
-        scored.append((score, n))
+        if n is not None:
+            scored.append((score, n))
     if not scored:
         return None
     scored.sort(reverse=True)
@@ -454,9 +461,11 @@ def parse_statement_text(text: str) -> ParsedStatement:
 
     # 5) Guardrails
     def suspicious_limit(v: Optional[str]) -> bool:
-        if not v: return False
+        if not v:
+            return False
         x = _money_to_float(v)
-        if x is None: return False
+        if x is None:
+            return False
         return x < 100.0  # BOA/Chase real limits won't be < $100
     if suspicious_limit(credit_limit):
         credit_limit = None

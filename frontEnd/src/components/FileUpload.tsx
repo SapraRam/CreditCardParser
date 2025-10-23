@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { Upload, FileText, CheckCircle, AlertCircle, XCircle, Loader2 } from 'lucide-react';
-import { parseStatement, ParseResponse, BankStatementData } from '../services/api';
+import { parseStatement, ParseResponse } from '../services/api';
 
 interface FileUploadProps {
   onParseComplete?: (result: ParseResponse) => void;
@@ -258,43 +258,117 @@ const FileUpload: React.FC<FileUploadProps> = ({ onParseComplete }) => {
                 <h3 className="text-xl font-bold text-white">Extracted Data</h3>
               </div>
               <div className="p-6 space-y-4">
-                {Object.entries(result.data as BankStatementData).map(([key, value]) => {
-                  const label = key
-                    .split('_')
-                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ');
-                  
-                  let displayValue: string;
-                  if (key.includes('date')) {
-                    displayValue = formatDate(value as string);
-                  } else if (key.includes('payment') || key.includes('balance')) {
-                    displayValue = formatCurrency(value as number);
-                  } else {
-                    displayValue = value !== null ? String(value) : 'N/A';
-                  }
+                {/* Account Number */}
+                {result.data.account_number !== undefined && (
+                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">
+                      Account Number:
+                    </span>
+                    <span className={`text-lg font-medium ${
+                      result.data.account_number 
+                        ? 'text-gray-900 dark:text-gray-100'
+                        : 'text-gray-400 dark:text-gray-600'
+                    }`}>
+                      {result.data.account_number || 'N/A'}
+                    </span>
+                  </div>
+                )}
 
-                  const hasValue = value !== null && value !== undefined;
+                {/* Statement Date */}
+                {result.data.statement_date !== undefined && (
+                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">
+                      Statement Date:
+                    </span>
+                    <span className={`text-lg font-medium ${
+                      result.data.statement_date 
+                        ? 'text-gray-900 dark:text-gray-100'
+                        : 'text-gray-400 dark:text-gray-600'
+                    }`}>
+                      {formatDate(result.data.statement_date)}
+                    </span>
+                  </div>
+                )}
 
-                  return (
-                    <div
-                      key={key}
-                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg"
-                    >
-                      <span className="font-semibold text-gray-700 dark:text-gray-300">
-                        {label}:
-                      </span>
-                      <span
-                        className={`text-lg font-medium ${
-                          hasValue
-                            ? 'text-gray-900 dark:text-gray-100'
-                            : 'text-gray-400 dark:text-gray-600'
-                        }`}
-                      >
-                        {displayValue}
-                      </span>
-                    </div>
-                  );
-                })}
+                {/* Payment Due Date */}
+                {result.data.payment_due_date !== undefined && (
+                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">
+                      Payment Due Date:
+                    </span>
+                    <span className={`text-lg font-medium ${
+                      result.data.payment_due_date 
+                        ? 'text-red-600 dark:text-red-400 font-bold'
+                        : 'text-gray-400 dark:text-gray-600'
+                    }`}>
+                      {formatDate(result.data.payment_due_date)}
+                    </span>
+                  </div>
+                )}
+
+                {/* New Balance */}
+                {result.data.new_balance !== undefined && (
+                  <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+                    <span className="font-semibold text-blue-800 dark:text-blue-300">
+                      Current Balance:
+                    </span>
+                    <span className={`text-xl font-bold ${
+                      result.data.new_balance 
+                        ? 'text-blue-900 dark:text-blue-100'
+                        : 'text-gray-400 dark:text-gray-600'
+                    }`}>
+                      {formatCurrency(result.data.new_balance)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Minimum Payment Due */}
+                {result.data.minimum_payment_due !== undefined && (
+                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">
+                      Minimum Payment Due:
+                    </span>
+                    <span className={`text-lg font-medium ${
+                      result.data.minimum_payment_due 
+                        ? 'text-gray-900 dark:text-gray-100'
+                        : 'text-gray-400 dark:text-gray-600'
+                    }`}>
+                      {formatCurrency(result.data.minimum_payment_due)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Available Credit */}
+                {result.data.available_credit !== undefined && (
+                  <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border-2 border-green-200 dark:border-green-800">
+                    <span className="font-semibold text-green-800 dark:text-green-300">
+                      Available Credit:
+                    </span>
+                    <span className={`text-xl font-bold ${
+                      result.data.available_credit 
+                        ? 'text-green-900 dark:text-green-100'
+                        : 'text-gray-400 dark:text-gray-600'
+                    }`}>
+                      {formatCurrency(result.data.available_credit)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Credit Limit */}
+                {result.data.credit_limit !== undefined && (
+                  <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">
+                      Credit Limit:
+                    </span>
+                    <span className={`text-lg font-medium ${
+                      result.data.credit_limit 
+                        ? 'text-gray-900 dark:text-gray-100'
+                        : 'text-gray-400 dark:text-gray-600'
+                    }`}>
+                      {formatCurrency(result.data.credit_limit)}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           )}

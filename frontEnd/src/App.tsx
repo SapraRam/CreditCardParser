@@ -486,14 +486,15 @@ function ResultsCard({ data, bank, onDownload }: ResultsCardProps) {
           Analysis Results
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5 auto-rows-auto">
-          {/* Card Issuer - Tall */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+          {/* Card Issuer */}
           <div
-            className={`glass p-6 rounded-3xl shadow-2xl transition-all duration-500 md:row-span-2 flex flex-col justify-between overflow-hidden relative ${
+            className={`glass p-6 rounded-3xl shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden relative ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
             style={{
               background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+              minHeight: '180px',
               transitionDelay: isVisible ? '0ms' : '0ms'
             }}
           >
@@ -503,21 +504,16 @@ function ResultsCard({ data, bank, onDownload }: ResultsCardProps) {
             ></div>
             
             <div className="relative z-10">
-              <p className="text-xs uppercase tracking-wider mb-4 font-bold opacity-90 text-purple-100">
+              <p className="text-xs uppercase tracking-wider mb-3 font-bold opacity-90 text-purple-100">
                 Card Issuer
               </p>
               <p className="text-2xl md:text-3xl font-black leading-tight text-white">
                 {getIssuerName(bank)}
               </p>
             </div>
-            <div className="mt-6 pt-4 border-t-2 opacity-50 relative z-10 border-white">
-              <p className="text-xs uppercase tracking-wider font-semibold text-white">
-                {bank.toUpperCase()}
-              </p>
-            </div>
           </div>
 
-          {/* Card Number - Square */}
+          {/* Available Credit */}
           <div
             className={`glass p-6 rounded-3xl shadow-2xl transition-all duration-500 relative overflow-hidden flex flex-col justify-between ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
@@ -535,38 +531,21 @@ function ResultsCard({ data, bank, onDownload }: ResultsCardProps) {
             
             <div className="relative z-10">
               <p className="text-xs uppercase tracking-wider mb-3 font-bold opacity-90 text-orange-100">
-                Card Number
+                Available Credit
               </p>
-              <div className="flex items-center gap-1.5 mb-2">
-                <div className="flex gap-0.5">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="w-1.5 h-1.5 rounded-full bg-white opacity-70"></div>
-                  ))}
-                </div>
-                <div className="flex gap-0.5">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="w-1.5 h-1.5 rounded-full bg-white opacity-70"></div>
-                  ))}
-                </div>
-                <div className="flex gap-0.5">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="w-1.5 h-1.5 rounded-full bg-white opacity-70"></div>
-                  ))}
-                </div>
-              </div>
-              <p className="text-xl md:text-2xl font-mono font-black tracking-widest text-white">
-                {data.card_number || 'N/A'}
+              <p className="text-2xl md:text-3xl font-black text-white">
+                {data.available_credit || 'N/A'}
               </p>
             </div>
           </div>
 
-          {/* Billing Cycle - Immersive Vertical */}
+          {/* Credit Limit */}
           <div
             className={`glass p-6 rounded-3xl shadow-2xl transition-all duration-500 relative overflow-hidden flex flex-col justify-between ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
             style={{
-              background: 'linear-gradient(180deg, #10b981, #059669)',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
               minHeight: '180px',
               transitionDelay: isVisible ? '200ms' : '0ms'
             }}
@@ -576,56 +555,17 @@ function ResultsCard({ data, bank, onDownload }: ResultsCardProps) {
             
             <div className="relative z-10">
               <p className="text-xs uppercase tracking-wider mb-3 font-bold text-emerald-100">
-                Billing Cycle
+                Credit Limit
               </p>
-              
-              <div className="space-y-2">
-                {data.billing_cycle ? (
-                  <>
-                    <p className="text-xl font-black text-white leading-tight">
-                      {data.billing_cycle}
-                    </p>
-                  </>
-                ) : (
-                  <p className="text-xl font-black text-white leading-tight">
-                    N/A
-                  </p>
-                )}
-              </div>
+              <p className="text-2xl md:text-3xl font-black text-white leading-tight">
+                {data.credit_limit || 'N/A'}
+              </p>
             </div>
           </div>
 
-          {/* Card Provider - Square */}
+          {/* Payment Due Date */}
           <div
-            className={`glass p-6 rounded-3xl shadow-2xl transition-all duration-500 relative overflow-hidden flex flex-col justify-between ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-            style={{
-              background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-              minHeight: '180px',
-              transitionDelay: isVisible ? '250ms' : '0ms'
-            }}
-          >
-            {/* Brand Badge Effect */}
-            <div className="absolute -bottom-6 -right-6 w-20 h-20 rounded-full opacity-20 bg-white"></div>
-            
-            <div className="relative z-10">
-              <p className="text-xs uppercase tracking-wider mb-3 font-bold opacity-80 text-blue-100">
-                Card Number Ending
-              </p>
-              <p className="text-2xl md:text-3xl font-black font-mono text-white">
-                {data.card_number || 'N/A'}
-              </p>
-            </div>
-            <div className="relative z-10 mt-3 flex items-center gap-2">
-              <div className="w-8 h-5 rounded bg-white bg-opacity-30"></div>
-              <div className="w-5 h-5 rounded-full bg-white bg-opacity-30"></div>
-            </div>
-          </div>
-
-          {/* Payment Due Date - Square */}
-          <div
-            className={`glass p-6 rounded-3xl shadow-2xl transition-all duration-500 flex flex-col justify-between ${
+            className={`glass p-6 rounded-3xl shadow-2xl transition-all duration-500 flex flex-col justify-between overflow-hidden relative ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
             style={{
@@ -634,17 +574,21 @@ function ResultsCard({ data, bank, onDownload }: ResultsCardProps) {
               transitionDelay: isVisible ? '300ms' : '0ms'
             }}
           >
-            <p className="text-xs uppercase tracking-wider mb-3 font-bold opacity-80" style={{ color: 'var(--md-sys-color-on-error-container)' }}>
-              Payment Due Date
-            </p>
-            <p className="text-2xl md:text-3xl font-black" style={{ color: 'var(--md-sys-color-on-error-container)' }}>
-              {data.due_date || data.payment_due_date || 'N/A'}
-            </p>
+            <div className="absolute -bottom-6 -right-6 w-24 h-24 rounded-full opacity-10 bg-white"></div>
+            
+            <div className="relative z-10">
+              <p className="text-xs uppercase tracking-wider mb-3 font-bold opacity-80" style={{ color: 'var(--md-sys-color-on-error-container)' }}>
+                Payment Due Date
+              </p>
+              <p className="text-2xl md:text-3xl font-black" style={{ color: 'var(--md-sys-color-on-error-container)' }}>
+                {data.payment_due_date || 'N/A'}
+              </p>
+            </div>
           </div>
 
           {/* Total Balance - Full Width */}
           <div
-            className={`glass p-7 rounded-3xl shadow-2xl transition-all duration-500 md:col-span-3 ${
+            className={`glass p-7 rounded-3xl shadow-2xl transition-all duration-500 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
             style={{
@@ -655,16 +599,10 @@ function ResultsCard({ data, bank, onDownload }: ResultsCardProps) {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
                 <p className="text-xs uppercase tracking-wider mb-3 font-bold opacity-80" style={{ color: 'var(--md-sys-color-primary)' }}>
-                  Total Balance Due
+                  Payment Due
                 </p>
                 <p className="text-4xl md:text-5xl font-black tracking-tight" style={{ color: 'var(--md-sys-color-primary)' }}>
-                  ${data.total_amount || data.new_balance || 'N/A'}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 opacity-70">
-                <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--md-sys-color-primary)' }}></div>
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--md-sys-color-primary)' }}>
-                  Outstanding
+                  { data.new_balance || 'N/A'}
                 </p>
               </div>
             </div>

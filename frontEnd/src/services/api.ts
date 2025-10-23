@@ -5,28 +5,28 @@
 
 import axios from 'axios';
 
-// Backend API base URL - FastAPI Backend
+// Backend API base URL - Flask Backend
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// API endpoints (matching FastAPI backend)
+// API endpoints (matching Flask backend)
 const ENDPOINTS = {
   PARSE: '/parse',      // Main parsing endpoint
   HEALTH: '/health',    // Health check endpoint
   BANKS: '/banks',      // Supported banks endpoint
 };
 
-// Response types matching FastAPI backend
+// Response types matching Flask backend
 
-// Bank statement data returned by the FastAPI backend
+// Bank statement data returned by the Flask backend
 export interface BankStatementData {
-  account_number: string | null;       // Masked account number (e.g., "****1234")
-  statement_date: string | null;       // Statement closing date (YYYY-MM-DD)
   payment_due_date: string | null;     // Payment due date (YYYY-MM-DD)
-  minimum_payment_due: number | null;  // Minimum payment amount
-  new_balance: number | null;          // Current balance
+  minimum_payment_due: string | null;  // Minimum payment amount (as string like "$100.00")
+  new_balance: string | null;          // Current balance (as string like "$1,234.56")
+  available_credit?: string | null;    // Available credit (as string like "$8,765.44")
+  credit_limit?: string | null;        // Credit limit (as string like "$10,000.00")
 }
 
-// Main parse response from FastAPI backend
+// Main parse response from Flask backend
 export interface ParseResponse {
   success: boolean;
   bank?: string;                       // Bank name (e.g., "Bank of America")
@@ -90,7 +90,7 @@ export interface Statement {
 }
 
 /**
- * Parse a bank statement PDF using the FastAPI backend
+ * Parse a bank statement PDF using the Flask backend
  * @param file - PDF file to parse
  * @returns Parsed data from the statement
  */
@@ -106,7 +106,7 @@ export const parseStatement = async (file: File): Promise<ParseResponse> => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        timeout: 60000, // 60 seconds timeout (OCR can take time)
+        timeout: 600000, // 600 seconds timeout (OCR can take time)
       }
     );
 
@@ -121,7 +121,7 @@ export const parseStatement = async (file: File): Promise<ParseResponse> => {
         return {
           success: false,
           error: 'No response from server',
-          message: 'Please ensure the FastAPI backend is running on http://localhost:5000'
+          message: 'Please ensure the Flask backend is running on http://localhost:5000'
         };
       }
     }
@@ -134,7 +134,7 @@ export const parseStatement = async (file: File): Promise<ParseResponse> => {
 };
 
 /**
- * Check if the FastAPI backend API is healthy
+ * Check if the Flask backend API is healthy
  * @returns Health status
  */
 export const checkHealth = async (): Promise<HealthResponse> => {
@@ -145,12 +145,12 @@ export const checkHealth = async (): Promise<HealthResponse> => {
     );
     return response.data;
   } catch (error) {
-    throw new Error('FastAPI backend service is not available. Please start it with: python app.py');
+    throw new Error('Flask backend service is not available. Please start it with: python app.py');
   }
 };
 
 /**
- * Get list of supported banks from FastAPI backend
+ * Get list of supported banks from Flask backend
  * @returns List of supported banks
  */
 export const getSupportedBanks = async (): Promise<BanksResponse> => {
