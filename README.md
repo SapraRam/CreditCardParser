@@ -1,59 +1,4 @@
-# Backend-Frontend Integration Guide
-
-## Integration Summary
-
-Successfully integrated the Flask backend with the React frontend for the Credit Card Parser application.
-
-## Changes Made
-
-### Backend Changes (app.py)
-
-1. **Updated API Endpoints:**
-   - Changed `/api/parse` → `/parse` to match frontend expectations
-   - Added `/banks` endpoint to return list of supported card providers
-   - Updated `/health` endpoint to return proper health status format
-
-2. **Response Format:**
-   - Modified `/parse` endpoint to return standardized response:
-     ```json
-     {
-       "success": true/false,
-       "bank": "Bank of America",
-       "method": "ocr",
-       "data": {
-         "account_number": null,
-         "statement_date": null,
-         "payment_due_date": "2025-11-15",
-         "minimum_payment_due": null,
-         "new_balance": 1250.50,
-         "available_credit": 8749.50,
-         "credit_limit": 10000.00
-       },
-       "warnings": [],
-       "error": null,
-       "message": null
-     }
-     ```
-
-3. **CORS Configuration:**
-   - Enhanced CORS settings to allow requests from frontend (localhost:5173, localhost:3000)
-   - Configured allowed origins, methods, and headers
-
-### Frontend Changes
-
-1. **API Service (src/services/api.ts):**
-   - Updated comments to reference Flask backend instead of FastAPI
-   - Added `available_credit` and `credit_limit` fields to `BankStatementData` interface
-   - Updated error messages to reference Flask backend
-
-2. **FileUpload Component (src/components/FileUpload.tsx):**
-   - Enhanced UI to display all extracted fields individually
-   - Added special highlighting for important fields:
-     - **Current Balance**: Blue background with border
-     - **Available Credit**: Green background with border
-     - **Payment Due Date**: Red text (highlighted)
-   - Improved field display with proper formatting
-   - Each field shows "N/A" when data is not available
+# Backend-Frontend Guide
 
 ## API Endpoints
 
@@ -96,6 +41,8 @@ Successfully integrated the Flask backend with the React frontend for the Credit
 ### Start Backend (Terminal: py)
 ```bash
 cd backend
+py -m venv
+source venv/Scrips/activate
 python app.py
 ```
 The Flask server will start on `http://localhost:5000`
