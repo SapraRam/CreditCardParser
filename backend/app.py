@@ -1,14 +1,9 @@
-# app.py
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import os
 import io
-import json
 import tempfile
 import importlib
 from dataclasses import asdict, is_dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -26,16 +21,9 @@ CORS(app, resources={
 # ---------------------------
 # Parser module auto-discovery
 # ---------------------------
-# Set PARSER_MODULE env var to your logic filename (without .py)
-# Defaults to trying common names if not provided.
 PARSER_CANDIDATES = [
-    os.environ.get("PARSER_MODULE"),
-    "ocr_card_parser",
-    "statement_parser",
-    "parser",
-    "new",
+    "parse",
 ]
-PARSER_CANDIDATES = [m for m in PARSER_CANDIDATES if m]
 
 def _load_parser():
     last_err = None
@@ -61,6 +49,7 @@ HAS_PARSE_TEXT  = hasattr(parser_mod, "parse_statement_text")
 REQUIRED_KEYS = ["file", "card_provider", "available_credit", "payment_due_date", "new_balance", "credit_limit"]
 
 def _normalize_result(obj: Any, filename: Optional[str]) -> Dict[str, Any]:
+    out: Dict[str, Any]
     if obj is None:
         out = {k: None for k in REQUIRED_KEYS}
     elif is_dataclass(obj):
